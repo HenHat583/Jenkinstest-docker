@@ -39,7 +39,7 @@ pipeline {
             steps {
                 sh 'echo Copying S3 object to EC2...'
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'henhat583']]) {
-                    sh 'scp -i /var/lib/jenkins/.ssh/hen.pem -o StrictHostKeyChecking=no flask.tar.gz ec2-user@13.51.44.20:/home/ec2-user'
+                    sh 'scp -i /var/lib/jenkins/.ssh/hen.pem -o StrictHostKeyChecking=no flask.tar.gz ec2-user@13.48.78.168:/home/ec2-user'
                 }
             }
         }

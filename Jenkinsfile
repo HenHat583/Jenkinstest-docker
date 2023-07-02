@@ -48,7 +48,7 @@ pipeline {
         stage('Run Flask App on EC2') {
             steps {
                 sh 'echo "Running Flask app on EC2..."'
-                sh 'ssh -i /home/henhat583/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.49.138.51 "cd /home/ec2-user && tar xvf flask.tar.gz && cd /home/ec2-user/flask && flask run"'
+                sh 'ssh -i /home/henhat583/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.49.138.51 "cd /home/ec2-user && tar xvf flask.tar.gz"'
             }
         }
     }

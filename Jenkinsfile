@@ -49,9 +49,9 @@ pipeline {
             steps {
                 sh 'echo "Running Flask app on EC2..."'
                 sh 'sudo ssh -i /home/henhat583/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.49.138.51 "cd /home/ec2-user && tar xvf flask.tar.gz"'
-                sh 'sudo ssh -i /home/henhat583/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.49.138.51 "cd /home/ec2-user/flask && pip install -r requirements.txt"'
-                sh 'sudo ssh -i /home/henhat583/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.49.138.51 "export FLASK_APP=/home/ec2-user/flask/app.py && flask run"'
-            }
+                sh 'sudo ssh -i /home/henhat583/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.49.138.51 "sudo yum install python3-pip -y"'
+                sh 'sudo ssh -i /home/henhat583/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.49.138.51 "cd /home/ec2-user/flask && pip3 install -r requirements.txt"'
+                sh 'sudo ssh -i /home/henhat583/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.49.138.51 "export FLASK_APP=/home/ec2-user/flask/app.py && flask run &"'            }
         }
     }
 }

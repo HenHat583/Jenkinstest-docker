@@ -49,7 +49,7 @@ pipeline {
             steps {
                 sh 'echo "Running Flask app on EC2..."'
                 sh 'ssh -i /var/lib/jenkins/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@16.16.160.227 "cd /home/ec2-user && tar xvf flask.tar.gz"'
-                sh 'ssh -i /var/lib/jenkins/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@16.16.160.227 "sudo pkill flask ; cd flask ; sudo nohup flask run --host=0.0.0.0 & ; sleep 3"'
+                sh 'ssh -i /var/lib/jenkins/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@16.16.160.227 "cd flask ; sudo bash deploy.sh"'
             }
         }
     }

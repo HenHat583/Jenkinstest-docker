@@ -49,7 +49,9 @@ pipeline {
             steps {
                 sh 'echo "Running Flask app on EC2..."'
                 sh 'ssh -i /var/lib/jenkins/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@16.16.160.227 "cd /home/ec2-user && tar xvf flask.tar.gz"'
-                sh 'ssh -i /var/lib/jenkins/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@16.16.160.227 "sudo bash -x flask/deploy.sh"'
+                withEnv(['JENKINS_NODE_COOKIE=dontKillMe']) {
+                    sh 'ssh -i /var/lib/jenkins/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@16.16.160.227 "sudo bash -x flask/deploy.sh"'
+                }
             }
         }
     }

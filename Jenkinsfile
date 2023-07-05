@@ -23,7 +23,7 @@ pipeline {
                 sh 'sudo docker build -t henhat583/flask-app:latest ./flask'
             }
         }
-        
+
         stage('Push To Docker Hub') {
             steps {
                 sh 'echo "Pushing to Docker Hub..."'
@@ -34,7 +34,7 @@ pipeline {
             }
         }
 
-       stage('Pull Docker Image on EC2') {
+        stage('Pull Docker Image on EC2') {
             steps {
                 sh 'echo "Pulling Docker image on EC2..."'
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'henhat583']]) {
@@ -43,7 +43,22 @@ pipeline {
             }
         }
 
-        stage('Run Flask App on EC2') {
+        stage('Check Flask with cURL on a test server') {
+            steps {
+                sh 'echo "Checking Flask app using cURL..."'
+                sh 'ssh -i /var/lib/jenkins/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.53.48.43 "curl -s http://localhost:5000"'
+            }
+            post {
+                success {
+                    echo "Flask app is running successfully."
+                }
+                failure {
+                    error "Flask app check failed. Exiting the pipeline."
+                }
+            }
+        }
+
+        stage('Run Flask App on EC2 prod server') {
             steps {
                 sh 'echo "Running Flask app on EC2..."'
                 sh 'ssh -i /var/lib/jenkins/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.50.231.2 "cd /home/ec2-user && tar xvf flask.tar.gz"'

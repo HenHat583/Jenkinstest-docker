@@ -19,13 +19,20 @@ pipeline {
             }
         }
 
+        stage('Build Docker Image') {
+            steps {
+                sh 'echo "Building Docker image..."'
+                sh 'docker build -t henhat583/flask-app:latest ./flask'
+            }
+        }
+        
         stage('Push To Docker Hub') {
             steps {
                 sh 'echo "Pushing to Docker Hub..."'
-                withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'henhat583', passwordVariable: 'DOCKERHUB_PASSWOR')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                     sh 'docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD'
-                    sh 'docker build -t your-dockerhub-username/flask-app:latest .'
-                    sh 'docker push your-dockerhub-username/flask-app:latest'
+                    sh 'docker build -t henhat583/flask-app:latest .'
+                    sh 'docker push henhat583/flask-app:latest'
                 }
             }
         }

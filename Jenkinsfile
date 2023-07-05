@@ -22,7 +22,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'echo "Building Docker image..."'
-                sh 'docker build -t henhat583/flask-app:latest ./flask'
+                sh 'sudo docker build -t henhat583/flask-app:latest ./flask'
             }
         }
         

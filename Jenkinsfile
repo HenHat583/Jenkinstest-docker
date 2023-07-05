@@ -19,19 +19,13 @@ pipeline {
             }
         }
 
-        stage('Build & Zip') {
+        stage('Push To Docker Hub') {
             steps {
-                script {
-                    sh 'tar czvf flask.tar.gz flask'
-                }
-            }
-        }
-
-        stage('Push To Cloud') {
-            steps {
-                sh 'echo "Pushing to S3..."'
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'henhat583']]) {
-                    sh 'aws s3 cp flask.tar.gz s3://hensbucket/flask.tar.gz'
+                sh 'echo "Pushing to Docker Hub..."'
+                withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'henhat583', passwordVariable: 'DOCKERHUB_PASSWOR')]) {
+                    sh 'docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD'
+                    sh 'docker build -t your-dockerhub-username/flask-app:latest .'
+                    sh 'docker push your-dockerhub-username/flask-app:latest'
                 }
             }
         }

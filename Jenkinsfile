@@ -40,7 +40,7 @@ pipeline {
             steps {
                 sh 'echo "Pulling Docker image on EC2..."'
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'henhat583']]) {
-                    sh 'ssh -i /home/henhat583/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.50.231.2 "sudo docker pull henhat583/flask-app:latest"'
+                    sh 'sudo ssh -i /home/henhat583/.ssh/hen.pem -o StrictHostKeyChecking=no ec2-user@13.50.231.2 "sudo docker pull henhat583/flask-app:latest"'
                 }
             }
         }

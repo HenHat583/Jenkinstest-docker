@@ -30,9 +30,8 @@ pipeline {
             steps {
                 sh 'echo "Pushing to Docker Hub..."'
                 withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                    sh 'sudo docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD'
-                    sh 'sudo docker build -t henhat583/flask-app:latest .'
-                    sh 'sudo docker push henhat583/flask-app:latest'
+                sh 'sudo docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD'
+                sh 'sudo docker push henhat583/flask-app:latest'
                 }
             }
         }

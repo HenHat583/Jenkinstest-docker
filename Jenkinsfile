@@ -54,11 +54,11 @@ pipeline {
         stage('Check Flask with cURL on test server') {
             steps {
                 sh 'echo "Building and running Flask app on the test server..."'
-                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"cd $flaskAppPath && sudo docker run -d -p 5000:5000 $testInstance\""
+                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"cd $flaskAppPath && sudo docker run -d -p 5000:5000 $dockerImageName\""
                 sh 'sleep 15' // Give some time for the app to start
 
                 sh 'echo "Checking Flask app using cURL..."'
-                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"curl -s http://localhost:5000\""
+                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"curl -s http://$testInstance:5000\""
             }
             post {
                 success {

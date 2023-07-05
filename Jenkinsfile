@@ -42,15 +42,6 @@ pipeline {
             }
         }
 
-        stage('Pull Docker Image on EC2') {
-            steps {
-                sh 'echo "Pulling Docker image on EC2 prod server..."'
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'henhat583']]) {
-                    sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstance \"docker pull $dockerImageName\""
-                }
-            }
-        }
-
         stage('Pull Docker Image on Test Server') {
             steps {
                 sh 'echo "Pulling Docker image on test server..."'
@@ -64,7 +55,7 @@ pipeline {
             steps {
                 sh 'echo "Building and running Flask app on the test server..."'
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"cd $flaskAppPath && sudo docker run -d -p 5000:5000 $dockerImageName\""
-                sh 'sleep 10' // Give some time for the app to start
+                sh 'sleep 15' // Give some time for the app to start
 
                 sh 'echo "Checking Flask app using cURL..."'
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"curl -s http://localhost:5000\""
@@ -79,6 +70,16 @@ pipeline {
             }
         }
 
+        stage('Pull Docker Image on EC2') {
+            steps {
+                sh 'echo "Pulling Docker image on EC2 prod server..."'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'henhat583']]) {
+                    sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstance \"docker pull $dockerImageName\""
+                }
+            }
+        }
+
+        
         stage('Run Flask App on EC2 prod server') {
             steps {
                 sh 'echo "Running Flask app on EC2 prod server..."'

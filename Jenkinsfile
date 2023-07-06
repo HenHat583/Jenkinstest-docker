@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        testInstance = '13.53.48.43'
-        prodInstance = '13.50.231.2'
+        testInstance = '16.16.193.2'
+        prodInstance = '13.53.133.249'
         sshKeyPath = '/var/lib/jenkins/.ssh/hen.pem'
         dockerImageName = 'henhat583/flask-app:latest'
         flaskAppPath = '/flask'

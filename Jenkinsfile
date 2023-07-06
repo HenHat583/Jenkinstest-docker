@@ -83,7 +83,7 @@ pipeline {
         stage('Run Flask App on EC2 prod server') {
             steps {
                 sh 'echo "Running Flask app on EC2 prod server..."'
-                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstance \"cd $flaskAppPath && sudo docker run -d -p 5000:5000 $dockerImageName\""
+                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstance \"sudo docker run -d -p 5000:5000 $dockerImageName\""
             }
         }
     }

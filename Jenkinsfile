@@ -15,7 +15,9 @@ pipeline {
                 script {
                     def instanceIds = [testInstance, prodInstance]
                     withAWS(region: 'us-west-2', credentials: 'aws-credentials') {
-                        sh "aws ec2 start-instances --instance-ids ${instanceIds.join(' ')}"
+                        instanceIds.each { instanceId ->
+                            sh "aws ec2 start-instances --instance-ids $instanceId"
+                        }
                     }
                 }
             }
@@ -39,7 +41,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'echo "Building Docker image..."'
-                sh 'sudo docker build -t $dockerImageName ./flask'
+                sh "sudo docker build -t $dockerImageName ./$flaskAppPath"
             }
         }
 
@@ -65,7 +67,7 @@ pipeline {
         stage('Check Flask with cURL on test server') {
             steps {
                 sh 'echo "Building and running Flask app on the test server..."'
-                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"sudo docker rm -f test""
+                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"sudo docker rm -f test\""
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"sudo docker run -d -p 5000:5000 --name test $dockerImageName\""
                 sh 'sleep 15' // Give some time for the app to start
 
@@ -91,11 +93,10 @@ pipeline {
             }
         }
 
-        
         stage('Run Flask App on EC2 prod server') {
             steps {
                 sh 'echo "Running Flask app on EC2 prod server..."'
-                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstance \"sudo docker rm -f prod""
+                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstance \"sudo docker rm -f prod\""
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstance \"sudo docker run -d -p 5000:5000 --name prod $dockerImageName\""
             }
         }
@@ -105,7 +106,9 @@ pipeline {
                 script {
                     def instanceIds = [testInstance, prodInstance]
                     withAWS(region: 'us-west-2', credentials: 'aws-credentials') {
-                        sh "aws ec2 stop-instances --instance-ids ${instanceIds.join(' ')}"
+                        instanceIds.each { instanceId ->
+                            sh "aws ec2 stop-instances --instance-ids $instanceId"
+                        }
                     }
                 }
             }

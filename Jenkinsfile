@@ -21,14 +21,14 @@ pipeline {
                             sh "aws ec2 start-instances --instance-ids $instanceId"
                         }
                     }
-                    
+
                     // Retrieve IP addresses for instances
                     withAWS(region: 'eu-north-1', credentials: 'aws-credentials') {
                         testInstanceIP = sh(
                             returnStdout: true,
                             script: "aws ec2 describe-instances --instance-ids $testInstance --query 'Reservations[].Instances[].PublicIpAddress' --output text"
                         ).trim()
-                        
+
                         prodInstanceIP = sh(
                             returnStdout: true,
                             script: "aws ec2 describe-instances --instance-ids $prodInstance --query 'Reservations[].Instances[].PublicIpAddress' --output text"
@@ -115,10 +115,10 @@ pipeline {
         stage('Stop Instances') {
             steps {
                 script {
-                    def instanceIds = [testInstance, prodInstance]
-                    withAWS(region: 'us-west-2', credentials: 'aws-credentials') {
+                    def instanceIds = [testInstance]
+                    withAWS(region: 'eu-north-1', credentials: 'aws-credentials') {
                         instanceIds.each { instanceId ->
-                            sh "aws ec2 stop-instances --instance-ids $instanceId"
+                            sh "aws ec2 stop-instances --instance-ids $testInstanceIP"
                         }
                     }
                 }

@@ -118,7 +118,8 @@ pipeline {
                     def instanceIPs = [testInstanceIP]
                     withAWS(region: 'eu-north-1', credentials: 'aws-credentials') {
                         instanceIPs.each { instanceIP ->
-                            sh "aws ec2 stop-instances --filters \"Name=ip-address,Values=$instanceIP\""
+                            sh "aws ec2 stop-instances --instance-ids $testInstance"
+"
                         }
                     }
                 }

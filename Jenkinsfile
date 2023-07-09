@@ -2,14 +2,25 @@ pipeline {
     agent any
 
     environment {
-        testInstance = '16.16.193.2'
-        prodInstance = '13.53.133.249'
+        testInstance = 'i-009128357f678d70b' // Replace with your test instance ID
+        prodInstance = 'i-06ab6f9d6368899c9' // Replace with your prod instance ID
         sshKeyPath = '/var/lib/jenkins/.ssh/hen.pem'
         dockerImageName = 'henhat583/flask-app:latest'
         flaskAppPath = '/flask'
     }
 
     stages {
+        stage('Start Instances') {
+            steps {
+                script {
+                    def instanceIds = [testInstance, prodInstance]
+                    withAWS(region: 'us-west-2', credentials: 'aws-credentials') {
+                        sh "aws ec2 start-instances --instance-ids ${instanceIds.join(' ')}"
+                    }
+                }
+            }
+        }
+
         stage('Cleanup') {
             steps {
                 sh 'echo "Performing cleanup..."'
@@ -59,7 +70,7 @@ pipeline {
                 sh 'sleep 15' // Give some time for the app to start
 
                 sh 'echo "Checking Flask app using cURL..."'
-                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"curl -s http://$testInstance:5000\""
+                sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstance \"curl -s http://localhost:5000\""
             }
             post {
                 success {
@@ -86,6 +97,17 @@ pipeline {
                 sh 'echo "Running Flask app on EC2 prod server..."'
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstance \"sudo docker rm -f prod""
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstance \"sudo docker run -d -p 5000:5000 --name prod $dockerImageName\""
+            }
+        }
+
+        stage('Stop Instances') {
+            steps {
+                script {
+                    def instanceIds = [testInstance, prodInstance]
+                    withAWS(region: 'us-west-2', credentials: 'aws-credentials') {
+                        sh "aws ec2 stop-instances --instance-ids ${instanceIds.join(' ')}"
+                    }
+                }
             }
         }
     }

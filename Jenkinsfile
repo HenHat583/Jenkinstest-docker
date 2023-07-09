@@ -115,7 +115,7 @@ pipeline {
         stage('Stop Instances') {
             steps {
                 script {
-                    def instanceIds = [testInstance, prodInstance]
+                    def instanceIds = [testInstance]
                     withAWS(region: 'eu-north-1', credentials: 'aws-credentials') {
                         instanceIds.each { instanceId ->
                             sh "aws ec2 stop-instances --instance-ids $instanceId"

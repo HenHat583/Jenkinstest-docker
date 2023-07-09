@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     def instanceIds = [testInstance, prodInstance]
-                    withAWS(region: 'us-west-2', credentials: 'aws-credentials') {
+                    withAWS(region: 'eu-north-1', credentials: 'aws-credentials') {
                         instanceIds.each { instanceId ->
                             sh "aws ec2 start-instances --instance-ids $instanceId"
                         }

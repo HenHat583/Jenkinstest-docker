@@ -121,6 +121,8 @@ pipeline {
                             sh "aws ec2 stop-instances --instance-ids $instanceId"
                         }
                     }
+                    // Echo the URL of the application
+                    echo "The site is http://$prodInstanceIP:5000/"
                 }
             }
         }

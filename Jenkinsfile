@@ -12,6 +12,28 @@ pipeline {
     }
 
     stages {
+        stage('Cleanup') {
+            steps {
+                sh 'echo "Performing cleanup..."'
+                sh 'rm -rf flask flask.tar.gz'
+            }
+        }
+
+        stage('Clone') {
+            steps {
+                sh 'echo "Building..."'
+                sh 'git clone https://github.com/HenHat583/flask.git'
+                sh 'ls flask'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'echo "Building Docker image..."'
+                sh "sudo docker build -t $dockerImageName ./$flaskAppPath"
+            }
+        }
+
         stage('Start Instances') {
             steps {
                 script {
@@ -35,28 +57,6 @@ pipeline {
                         ).trim()
                     }
                 }
-            }
-        }
-
-        stage('Cleanup') {
-            steps {
-                sh 'echo "Performing cleanup..."'
-                sh 'rm -rf flask flask.tar.gz'
-            }
-        }
-
-        stage('Clone') {
-            steps {
-                sh 'echo "Building..."'
-                sh 'git clone https://github.com/HenHat583/flask.git'
-                sh 'ls flask'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'echo "Building Docker image..."'
-                sh "sudo docker build -t $dockerImageName ./$flaskAppPath"
             }
         }
 

@@ -112,7 +112,7 @@ pipeline {
             }
         }
 
-        stage('Instance') {
+        stage('stop test Instance') {
             steps {
                 script {
                     def instanceIds = [testInstance]

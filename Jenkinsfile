@@ -115,13 +115,19 @@ pipeline {
         stage('Stop Instances') {
             steps {
                 script {
-                    def instanceIds = [testInstance, prodInstance]
+                    def instanceIds = [prodInstance]
                     withAWS(region: 'eu-north-1', credentials: 'aws-credentials') {
                         instanceIds.each { instanceId ->
                             sh "aws ec2 stop-instances --instance-ids $instanceId"
                         }
                     }
                 }
+            }
+        }
+
+        stage('Print Production Instance IP') {
+            steps {
+                sh "echo \"The site is https://$prodInstanceIP\""
             }
         }
     }

@@ -112,10 +112,10 @@ pipeline {
             }
         }
 
-        stage('Stop Instances') {
+        stage('Instance') {
             steps {
                 script {
-                    def instanceIds = [testInstance, prodInstance]
+                    def instanceIds = [testInstance]
                     withAWS(region: 'eu-north-1', credentials: 'aws-credentials') {
                         instanceIds.each { instanceId ->
                             sh "aws ec2 stop-instances --instance-ids $instanceId"
@@ -125,11 +125,7 @@ pipeline {
             }
         }
     }
-
-    post {
-        always {
-            script {
-                sh "echo \"The site is https://$prodInstanceIP:5000\""
+    echo "The site is https://$prodInstanceIP:5000"
             }
         }
     }

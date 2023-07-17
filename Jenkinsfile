@@ -1,27 +1,17 @@
 pipeline {
     agent any
 
-    environment {
-        testInstance = 'i-009128357f678d70b' // Replace with your test instance ID
-        prodInstance = 'i-06ab6f9d6368899c9' // Replace with your prod instance ID
-        sshKeyPath = '/var/lib/jenkins/.ssh/hen.pem'
-        dockerImageName = 'henhat583/flask-app:latest'
-        flaskAppPath = '/flask'
-        testInstanceIP = '' // Environment variable for test instance IP
-        prodInstanceIP = '' // Environment variable for prod instance IP
-    }
-
     stages {
         stage('Cleanup') {
             steps {
-                sh 'echo "Performing cleanup..."'
+                echo "Performing cleanup..."
                 sh 'rm -rf flask flask.tar.gz'
             }
         }
 
         stage('Clone') {
             steps {
-                sh 'echo "Building..."'
+                echo "Building..."
                 sh 'git clone https://github.com/HenHat583/flask.git'
                 sh 'ls flask'
             }
@@ -29,7 +19,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'echo "Building Docker image..."'
+                echo "Building Docker image..."
                 sh "sudo docker build -t $dockerImageName ./$flaskAppPath"
             }
         }
@@ -62,7 +52,7 @@ pipeline {
 
         stage('Push To Docker Hub') {
             steps {
-                sh 'echo "Pushing to Docker Hub..."'
+                echo "Pushing to Docker Hub..."
                 withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                     sh 'sudo docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD'
                     sh 'sudo docker push $dockerImageName'
@@ -72,19 +62,19 @@ pipeline {
 
         stage('Pull Docker Image on Test Server') {
             steps {
-                sh 'echo "Pulling Docker image on test server..."'
+                echo "Pulling Docker image on test server..."
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstanceIP \"docker pull $dockerImageName\""
             }
         }
 
         stage('Check Flask with cURL on test server') {
             steps {
-                sh 'echo "Building and running Flask app on the test server..."'
+                echo "Building and running Flask app on the test server..."
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstanceIP \"sudo docker rm -f test\""
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstanceIP \"sudo docker run -d -p 5000:5000 --name test $dockerImageName\""
-                sh 'sleep 15' // Give some time for the app to start
+                sleep(15) // Give some time for the app to start
 
-                sh 'echo "Checking Flask app using cURL..."'
+                echo "Checking Flask app using cURL..."
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstanceIP \"curl -s http://localhost:5000\""
             }
             post {
@@ -99,30 +89,24 @@ pipeline {
 
         stage('Pull Docker Image on EC2') {
             steps {
-                sh 'echo "Pulling Docker image on EC2 prod server..."'
+                echo "Pulling Docker image on EC2 prod server..."
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstanceIP \"docker pull $dockerImageName\""
             }
         }
 
         stage('Run Flask App on EC2 prod server') {
             steps {
-                sh 'echo "Running Flask app on EC2 prod server..."'
+                echo "Running Flask app on EC2 prod server..."
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstanceIP \"sudo docker rm -f prod\""
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstanceIP \"sudo docker run -d -p 5000:5000 --name prod $dockerImageName\""
             }
         }
 
-        stage("https://$prodInstanceIP:5000") {
+        // Dynamically set the last stage name
+        String siteURL = "https://$prodInstanceIP:5000"
+        stage(siteURL) {
             steps {
-                // No actions required in this stage
-            }
-        }
-    }
-
-    post {
-        always {
-            script {
-                echo "The site is https://$prodInstanceIP:5000"
+                echo siteURL
             }
         }
     }

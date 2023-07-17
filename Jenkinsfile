@@ -121,15 +121,8 @@ pipeline {
                             sh "aws ec2 stop-instances --instance-ids $instanceId"
                         }
                     }
+                    echo "The site is https://$prodInstanceIP:5000"
                 }
-            }
-        }
-    }
-
-    post {
-        always {
-            script {
-                echo "The site is https://$prodInstanceIP:5000"
             }
         }
     }

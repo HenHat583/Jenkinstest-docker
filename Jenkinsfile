@@ -82,7 +82,7 @@ pipeline {
                 sh 'echo "Building and running Flask app on the test server..."'
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstanceIP \"sudo docker rm -f test\""
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstanceIP \"sudo docker run -d -p 5000:5000 --name test $dockerImageName\""
-                sh 'sleep 15' // Give some time for the app to start
+                sh 'sleep 10' // Give some time for the app to start
 
                 sh 'echo "Checking Flask app using cURL..."'
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$testInstanceIP \"curl -s http://localhost:5000\""

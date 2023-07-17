@@ -125,7 +125,11 @@ pipeline {
             }
         }
     }
-    echo "The site is https://$prodInstanceIP:5000"
+
+    post {
+        always {
+            script {
+                echo "The site is https://$prodInstanceIP:5000"
             }
         }
     }

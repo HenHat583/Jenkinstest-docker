@@ -129,7 +129,7 @@ pipeline {
     post {
         always {
             script {
-                echo "The site is https://$prodInstanceIP:5000"
+                echo "The site is http://$prodInstanceIP:5000"
             }
         }
     }

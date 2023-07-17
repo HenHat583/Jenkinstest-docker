@@ -1,6 +1,16 @@
 pipeline {
     agent any
 
+    environment {
+        testInstance = 'i-009128357f678d70b' // Replace with your test instance ID
+        prodInstance = 'i-06ab6f9d6368899c9' // Replace with your prod instance ID
+        sshKeyPath = '/var/lib/jenkins/.ssh/hen.pem'
+        dockerImageName = 'henhat583/flask-app:latest'
+        flaskAppPath = '/flask'
+        testInstanceIP = '' // Environment variable for test instance IP
+        prodInstanceIP = '' // Environment variable for prod instance IP
+    }
+
     stages {
         stage('Cleanup') {
             steps {
@@ -101,11 +111,12 @@ pipeline {
                 sh "sudo ssh -i $sshKeyPath -o StrictHostKeyChecking=no ec2-user@$prodInstanceIP \"sudo docker run -d -p 5000:5000 --name prod $dockerImageName\""
             }
         }
+    }
 
-        // Dynamically set the last stage name
-        String siteURL = "https://$prodInstanceIP:5000"
-        stage(siteURL) {
-            steps {
+    post {
+        always {
+            script {
+                def siteURL = "https://$prodInstanceIP:5000"
                 echo siteURL
             }
         }
